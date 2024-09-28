@@ -13,6 +13,11 @@ model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
 # Initialize chat history globally (per session this should be stored differently)
 chat_history_ids = None
 
+# Status check route
+@app.route("/status", methods=["GET"])
+def status():
+    return jsonify({"message": "API is running"}), 200
+
 @app.route("/chat", methods=["POST"])
 def chat():
     global chat_history_ids
