@@ -17,7 +17,7 @@ dist-ssr
 .vite
 
 # Virtual environments (from server)
-server/venv/
+venv
 
 # Editor directories and files
 .vscode/*
