@@ -20,7 +20,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 
-const API_URL = 'http://localhost:8000/chat/'
+const API_URL = '/chat/'
 
 export function useChat() {
   // Completed conversation history — array of { role, content }

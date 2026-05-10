@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    # Do NOT expose backend port to the host — accessible only to other services
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.env
+.venv
+.git
+.gitignore
+npm-debug.log
+Dockerfile
+**/node_modules
