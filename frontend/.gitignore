@@ -7,18 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node modules and build directories
 node_modules
 dist
 dist-ssr
 *.local
-
-# Vite
-.vite
-.env
-# Virtual environments (from server)
-venv
-.venv
 
 # Editor directories and files
 .vscode/*
@@ -30,9 +22,3 @@ venv
 *.njsproj
 *.sln
 *.sw?
-
-# Python specific ignores (if applicable)
-__pycache__/
-*.pyc
-
-

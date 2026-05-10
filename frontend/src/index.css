@@ -1,0 +1,301 @@
+/*
+  index.css — Global styles and design system.
+
+  We use CSS custom properties (variables) for every color and spacing value.
+  This means changing the look of the entire app = changing a few lines here.
+*/
+
+/* ── Google Fonts are loaded in index.html ── */
+
+/* ─────────────────────────────────────────────────────────
+   DESIGN TOKENS — the source of truth for all visual values
+   ───────────────────────────────────────────────────────── */
+:root {
+  /* Colors */
+  --bg:           #090b12;       /* main background — deep blue-black */
+  --surface:      #10121c;       /* cards, bubbles */
+  --surface-hi:   #181b28;       /* slightly lifted surface */
+  --border:       rgba(255,255,255,0.07);
+  --border-hi:    rgba(255,255,255,0.13);
+
+  /* Text */
+  --text:         #dfe2f0;       /* primary text */
+  --text-muted:   #525670;       /* timestamps, placeholders */
+  --text-dim:     #7b7fa0;       /* secondary labels */
+
+  /* Accent — electric cyan */
+  --accent:       #22d3ee;
+  --accent-dim:   rgba(34, 211, 238, 0.12);
+  --accent-glow:  rgba(34, 211, 238, 0.25);
+
+  /* User message */
+  --user-bg:      #141e35;
+  --user-border:  rgba(34, 211, 238, 0.2);
+
+  /* Danger */
+  --danger:       #f87171;
+  --danger-dim:   rgba(248, 113, 113, 0.1);
+
+  /* Spacing */
+  --radius:       14px;
+  --radius-sm:    8px;
+  --radius-lg:    20px;
+
+  /* Typography */
+  --font:         'Outfit', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+/* Light theme overrides when data-theme="light" is set on the document element */
+:root[data-theme="light"], [data-theme="light"] {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-hi: #f1f5f9;
+  --border: rgba(15,23,42,0.06);
+  --border-hi: rgba(15,23,42,0.1);
+
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+
+  --accent: #0ea5a4;
+  --accent-dim: rgba(14,165,164,0.08);
+  --accent-glow: rgba(14,165,164,0.15);
+
+  --user-bg: #eef2ff;
+  --user-border: rgba(99,102,241,0.15);
+
+  --danger: #dc2626;
+  --danger-dim: rgba(220,38,38,0.06);
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESET & BASE
+   ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove default button styles — we'll style them ourselves */
+button {
+  font-family: var(--font);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+textarea, input {
+  font-family: var(--font);
+  outline: none;
+  border: none;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SCROLLBAR — custom minimal scrollbar
+   ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border-hi); border-radius: 99px; }
+
+/* ─────────────────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────────────────── */
+
+/* Messages fade in from slightly below */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* The blinking cursor shown at the end of streaming text */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Subtle pulse for the loading dots */
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.0); }
+}
+
+/* Spin for loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─────────────────────────────────────────────────────────
+   MARKDOWN STYLES — for react-markdown rendering
+   ───────────────────────────────────────────────────────── */
+
+.markdown-body {
+  /* Inherit theme colors from parent context */
+  color: inherit;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.markdown-body p {
+  margin: 8px 0;
+}
+
+.markdown-body code,
+.markdown-body pre {
+  font-family: 'Fira Code', 'Courier New', monospace;
+}
+
+/* Syntax highlighting from highlight.js */
+.hljs {
+  background: #0f172a !important;
+  color: #e0e7ff !important;
+}
+
+.hljs-attr,
+.hljs-attribute {
+  color: #93c5fd;
+}
+
+.hljs-string {
+  color: #86efac;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #fbbf24;
+}
+
+.hljs-keyword {
+  color: #f472b6;
+}
+
+.hljs-function {
+  color: #60a5fa;
+}
+
+.hljs-title {
+  color: #a78bfa;
+}
+
+.hljs-comment {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Code block container */
+.markdown-body pre code {
+  display: block;
+  padding: 0;
+  background: none;
+  border: none;
+  overflow-x: auto;
+}
+
+/* Inline code in paragraphs */
+.markdown-body p code {
+  background: rgba(148, 163, 184, 0.1);
+  color: #e0e7ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Lists */
+.markdown-body ul,
+.markdown-body ol {
+  margin: 8px 0 8px 20px;
+  padding: 0;
+}
+
+.markdown-body li {
+  margin: 4px 0;
+  line-height: 1.6;
+}
+
+/* Blockquotes */
+.markdown-body blockquote {
+  border-left: 4px solid rgba(34, 211, 238, 0.4);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: rgba(226, 232, 240, 0.8);
+  font-style: italic;
+}
+
+/* Tables */
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.markdown-body th {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.markdown-body td {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  padding: 8px 12px;
+}
+
+/* Links */
+.markdown-body a {
+  color: #22d3ee;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.3);
+  transition: opacity 0.2s ease;
+}
+
+.markdown-body a:hover {
+  opacity: 0.8;
+}
+
+/* Headings */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.markdown-body h1 {
+  font-size: 24px;
+}
+
+.markdown-body h2 {
+  font-size: 20px;
+}
+
+.markdown-body h3 {
+  font-size: 17px;
+}
+
+/* Horizontal rule */
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  margin: 16px 0;
+}
