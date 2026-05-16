@@ -1,165 +1,169 @@
-# Robinson Chatbot
+# Robin Chat - Modular Architecture
 
-Robinson Chatbot is a streaming AI assistant built with FastAPI, React, Vite, and OpenRouter. It supports real-time responses, Markdown rendering, code highlighting, and uploaded attachments such as images and PDFs.
+A modern AI chatbot application with a modularized frontend and backend architecture.
 
-Live app: [https://chat.moodmirror.online](https://chat.moodmirror.online)
+## 📁 Project Structure
 
-## Features
-
-- Real-time streaming chat responses over Server-Sent Events
-- Markdown support with GitHub-flavored Markdown tables, lists, and code blocks
-- Syntax-highlighted code rendering
-- File attachments with instant previews before sending
-- Image and PDF handling on the backend
-- Dockerized frontend and backend for production deployment
-- Backend kept internal in Docker Compose, with the frontend proxying `/chat/`
-
-## Tech Stack
-
-- Frontend: React, Vite, `react-markdown`, `remark-gfm`, `rehype-highlight`, `highlight.js`
-- Backend: FastAPI, Uvicorn, `httpx`
-- AI Provider: OpenRouter
-- Deployment: Docker, Docker Compose, nginx
-
-## Project Structure
-
-```text
-backend/
-  main.py
-  core/
-  models/
-  routers/
-  services/
-frontend/
-  src/
-  public/
-  Dockerfile
-  nginx.conf
-docker-compose.yml
+```
+RobinsoN_chatbot/
+├── backend/              # FastAPI backend
+│   ├── main.py          # FastAPI app with routes
+│   ├── config.py        # Configuration and system prompt
+│   ├── database.py      # SQLite database setup
+│   ├── models.py        # Pydantic models
+│   ├── requirements.txt  # Python dependencies
+│   ├── .env.example     # Environment template
+│   └── robin_chat.db    # SQLite database (auto-created)
+│
+├── frontend/             # Vite + React + TypeScript + Tailwind
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── App.tsx      # Main app component
+│   │   ├── main.tsx     # Entry point
+│   │   ├── types.ts     # TypeScript types
+│   │   └── index.css    # Tailwind styles
+│   ├── index.html       # HTML entry
+│   ├── package.json     # Dependencies
+│   ├── vite.config.ts   # Vite configuration
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   └── tsconfig.json
+│
+└── README.md
 ```
 
-## How It Works
+## 🚀 Getting Started
 
-1. The user types a message in the frontend.
-2. Optional files are attached and previewed before sending.
-3. The frontend posts the message to `/chat/` as multipart form data.
-4. The backend processes the request, converts files if needed, and streams the OpenRouter response back to the client.
-5. nginx serves the built frontend and proxies `/chat/` to the backend container.
+### Backend Setup
 
-## Requirements
-
-- Docker Desktop, or
-- Node.js 20.19+ for frontend development
-- Python 3.11+ for backend development
-- An OpenRouter API key
-
-## Environment Variables
-
-Create `backend/.env` with at least:
-
-```env
-OPENROUTER_API_KEY=your_openrouter_api_key
-MODEL=nvidia/nemotron-nano-2-vl:free
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-MAX_TOKENS=2048
-APP_TITLE=AI Chatbot
-```
-
-Notes:
-
-- `OPENROUTER_API_KEY` is required.
-- `MODEL` must be a chat-capable model.
-- The app defaults to `nvidia/nemotron-nano-2-vl:free`.
-
-## Run With Docker Compose
-
-From the repository root:
-
-```bash
-docker compose up -d --build
-```
-
-Open the frontend in your browser at the mapped host port from `docker-compose.yml`.
-
-Current compose layout:
-
-- Frontend container: exposed on host port `5174`
-- Backend container: internal only, not exposed to the host
-
-## Stop Docker Compose
-
-```bash
-docker compose down
-```
-
-## Run Locally Without Docker
-
-### Backend
-
-```bash
+1. **Create virtual environment** (Windows):
+```powershell
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+.\.venv\Scripts\Activate
 ```
 
-The backend health check is available at:
+2. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+```
 
-- `http://localhost:8000/health`
+3. **Setup environment variables**:
+```bash
+cp .env.example .env
+# Edit .env and add your Hugging Face token
+```
 
-### Frontend
+4. **Run FastAPI server**:
+```bash
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
+The backend will be available at `http://localhost:8000`
+
+### Frontend Setup
+
+1. **Install dependencies**:
 ```bash
 cd frontend
 npm install
+```
+
+2. **Start development server**:
+```bash
 npm run dev
 ```
 
-Vite usually serves the app on:
+The frontend will be available at `http://localhost:5173`
 
-- `http://localhost:5173`
+## 🔌 API Endpoints
 
-## API
-
-### `POST /chat/`
-
-Streaming chat endpoint used by the frontend.
-
-Form fields:
-
-- `message` string, required
-- `history` stringified JSON array, optional
-- `files` one or more uploaded files, optional
-
-Response:
-
-- `text/event-stream`
-
-### `GET /health`
-
-Returns a simple health payload.
-
+### `POST /api/register`
+Register or get existing user
 ```json
 {
-  "status": "ok",
-  "model": "nvidia/nemotron-nano-2-vl:free"
+  "email": "user@example.com"
 }
 ```
 
-## Production Notes
+### `POST /api/chat`
+Send a message and get a response
+```json
+{
+  "email": "user@example.com",
+  "message": "Your message here"
+}
+```
 
-- The backend Dockerfile currently uses Uvicorn directly. For higher traffic, switch to Gunicorn with Uvicorn workers or another production process manager.
-- Keep the OpenRouter key out of version control.
-- Add authentication, rate limiting, and monitoring before opening the public endpoint to heavy traffic.
-- The frontend build uses Node 20 because the current Vite toolchain requires Node 20.19+.
+### `POST /api/clear-chat`
+Clear chat history for a user
+```json
+{
+  "email": "user@example.com"
+}
+```
 
-## Troubleshooting
+### `GET /api/health`
+Health check endpoint
 
-- If Docker build fails on frontend dependency install, make sure `backend/.env` exists and the frontend dependencies are installed with the current lockfile.
-- If you see blank or partial responses, confirm the backend `/chat/` endpoint is reachable and nginx buffering is disabled for SSE.
-- If attachments do not preview, verify the browser allows file access and the selected file type is supported.
+## 🎨 Features
 
-## Attribution
+- ✨ Beautiful, modern UI matching the original design
+- 🎯 Email-based user tracking (stateless)
+- 💾 SQLite database for user management
+- 🔐 Hugging Face token stored securely in backend (.env)
+- 📱 Responsive design
+- ⚡ Real-time chat interface
+- 🌓 Dark theme with custom color scheme
 
-Built and branded as Robinson Chatbot by Kavindu Pramod.
+## 🛠 Tech Stack
+
+**Backend:**
+- FastAPI
+- SQLAlchemy
+- SQLite
+- Hugging Face Hub API
+
+**Frontend:**
+- React 18
+- TypeScript
+- Tailwind CSS
+- Vite
+- Axios
+
+## 📝 Configuration
+
+### Backend (.env)
+```env
+HF_ACCESS_TOKEN=hf_xxxxxxxxxxxxxxxxxxxx
+MODEL_ID=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+MAX_TOKENS=800
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+```
+
+## 🔄 Workflow
+
+1. User enters email in the modal → Backend registers user in SQLite
+2. User sends message → Frontend sends to backend API
+3. Backend validates email, maintains chat session, calls Hugging Face API
+4. Response returned to frontend and displayed
+5. Chat history saved in localStorage (frontend)
+
+## 📦 Database
+
+SQLite database stores:
+- User emails
+- User creation timestamps
+
+Chat history is maintained in-memory on the backend (per email) for stateless behavior.
+
+## 🚀 Deployment Ready
+
+- Backend can be deployed to any Python hosting (Heroku, Railway, Render, etc.)
+- Frontend can be deployed to Vercel, Netlify, GitHub Pages, etc.
+- Update `CORS_ORIGINS` in backend .env for production URLs
+- Update API base URL in frontend App.tsx for production
+
+---
+
+**Created with ❤️ using modern web technologies**
